@@ -11,12 +11,17 @@ class MPrinterManager
 		MPrinterManager();
 		~MPrinterManager();
 		void addPrinterAt(std::string ip, int port);
+		int getNumPrinters();
+		MPrinter * getPrinter(int idx);
+		MPrinter * getPrinter(std::string ip);
 
 	private:
-		std::vector<MPrinter*> printers;
+		std::vector<MPrinter*> _printers;
 
 		bool attachPrinter(std::string ip, int port);
 		bool printerExist(std::string ip, int port);
+
+		inline bool isValid(int idx);
 };
 
 #endif //_MPRINTER_MANAGER_H

@@ -29,3 +29,8 @@ int MPrinter::getPort()
 {
 	return _port;
 }
+
+bool MPrinter::getFilesList(FilesCache filesList, std::string extensions)
+{
+	return false;
+}
