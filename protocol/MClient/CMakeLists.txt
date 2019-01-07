@@ -14,13 +14,13 @@ set(PROJECT_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/..)
 
 include_directories(${PROJECT_SOURCE_DIR}/src)
 include_directories(${PROJECT_SOURCE_DIR}/src/comms)
+include_directories(${PROJECT_SOURCE_DIR}/src/client)
+
 add_subdirectory(${PROJECT_SOURCE_DIR}/src ${CMAKE_BINARY_DIR}/src)
+add_subdirectory(${PROJECT_SOURCE_DIR}/src/client ${CMAKE_BINARY_DIR}/src/client)
 
 
 set(SOURCES ${SOURCES}
-	mclient.cpp
-	mprinter.cpp
-	mprintermanager.cpp
 	main.cpp)
 
 

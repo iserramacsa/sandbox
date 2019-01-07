@@ -10,6 +10,7 @@ configure_file (
 
 
 add_subdirectory(comms ${CMAKE_BINARY_DIR}/src/comms)
+
 if (INCLUDE_TESTS)
 	add_subdirectory(tests ${CMAKE_BINARY_DIR}/src/test)
 endif()

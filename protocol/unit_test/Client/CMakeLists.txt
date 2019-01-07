@@ -12,19 +12,15 @@ set(INCLUDE_TESTS true)
 
 set(PROJECT_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../..)
 
-include_directories(${PROJECT_SOURCE_DIR}/MCLient)
-include_directories(${PROJECT_SOURCE_DIR}/MCLient/tests)
 include_directories(${PROJECT_SOURCE_DIR}/src)
 include_directories(${PROJECT_SOURCE_DIR}/src/comms)
+include_directories(${PROJECT_SOURCE_DIR}/src/client)
 
 add_subdirectory(${PROJECT_SOURCE_DIR}/src ${CMAKE_BINARY_DIR}/src)
-add_subdirectory(${PROJECT_SOURCE_DIR}/MCLient/tests ${CMAKE_BINARY_DIR}/tests)
+add_subdirectory(${PROJECT_SOURCE_DIR}/src/client ${CMAKE_BINARY_DIR}/client)
 
 
 set(SOURCES ${SOURCES}
-	${PROJECT_SOURCE_DIR}/MCLient/mclient.cpp
-	${PROJECT_SOURCE_DIR}/MCLient/mprinter.cpp
-	${PROJECT_SOURCE_DIR}/MCLient/mprintermanager.cpp
 	main.cpp)
 
 add_executable(${PROJECT_NAME} ${SOURCES})
@@ -34,3 +30,4 @@ target_link_libraries(${PROJECT_NAME}
 	/usr/lib/libgmock.a
 	-pthread
 	)
+
