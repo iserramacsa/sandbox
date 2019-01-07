@@ -2,7 +2,6 @@
 #include <sys/types.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <sys/socket.h>
 #include <netinet/in.h>
 
 #include <sys/types.h>
@@ -10,6 +9,7 @@
 #include <netdb.h>
 #include <unistd.h>
 #include <strings.h>
+#include <vector>
 
 #define UNUSED(x) (void)(x)
 
@@ -43,7 +43,7 @@ bool ClientUnixSocket::disconnect()
 		_opened = false;
 	}
 
-	return _opened;
+	return !_opened;
 }
 
 bool ClientUnixSocket::send(const char *tx)
@@ -89,7 +89,7 @@ bool ClientUnixSocket::receive(char &rx, int timeout)
 
 bool ClientUnixSocket::connectTo(const char *address, int port)
 {
-	if(_opened){
+	if(_opened && isValidConnectionData(address, port)){
 		struct sockaddr_in	serverAddr;
 		struct hostent		*server;
 
@@ -104,11 +104,50 @@ bool ClientUnixSocket::connectTo(const char *address, int port)
 				  (char *)&serverAddr.sin_addr.s_addr,
 				  server->h_length);
 			serverAddr.sin_port = htons(port);
-			_connected = (connect(_socketFd,(struct sockaddr *) &serverAddr,sizeof(serverAddr)) >= 0);
+			_connected = connectToServer(_socketFd, ( struct sockaddr * ) &serverAddr);
 		}
 	}
 
 	return _connected;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+bool ClientUnixSocket::connectToServer(int fd, struct sockaddr * addr)
+{
+	int success = connect(fd, addr, sizeof(*addr));
+
+	if (success == -1) {
+		perror(__PRETTY_FUNCTION__);
+	}
+
+	return (success == 0);
+}
+
+bool ClientUnixSocket::isValidConnectionData(const char *address, int port)
+{
+	bool validAddress = false;
+	bool validPort = false;
+	std::string add = address;
+
+	if (add.size() >= 7) {
+		std::vector<int> ints;
+		size_t pos = add.find_first_of(".");
+		while (pos != add.npos){
+			ints.push_back(std::atoi(add.substr(0, pos).c_str()));
+			add = add.substr(pos + 1);
+			pos = add.find_first_of(".");
+		}
+		ints.push_back(std::atoi(add.substr(0, pos).c_str()));
+		if (ints.size() == 4){
+			validAddress = (ints.at(0) >= 0 && ints.at(0) <= 255);
+			validAddress &= (ints.at(1) >= 0 && ints.at(1) <= 255);
+			validAddress &= (ints.at(2) >= 0 && ints.at(2) <= 255);
+			validAddress &= (ints.at(3) >= 0 && ints.at(3) <= 255);
+		}
+	}
+	validPort = (port > 0 && port < 0xFFFF);
+
+	return validAddress && validPort;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////

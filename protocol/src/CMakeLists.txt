@@ -16,7 +16,7 @@ if (INCLUDE_TESTS)
 endif()
 
 set(SOURCES ${SOURCES}
-	${CMAKE_CURRENT_SOURCE_DIR}/commands.cpp
+#	${CMAKE_CURRENT_SOURCE_DIR}/commands.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/tinyxml2.cpp
 	PARENT_SCOPE
 	)

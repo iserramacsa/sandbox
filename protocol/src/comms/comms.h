@@ -8,10 +8,8 @@ class Comms
 	public:
 		Comms();
 		~Comms(){};
-		void ConnectToServer(std::string ip, int port);
-
-
-		void send(std::string ip, int port, std::string msg);
+		virtual void ConnectToServer(std::string ip, int port);
+		virtual void send(std::string ip, int port, std::string msg){};
 
 
 	private:

@@ -1,3 +1,45 @@
+#include "gtest/gtest.h"
+#include "gmock/gmock.h"
+#include "comms.h"
+
+class Comms_Mock : public Comms
+{
+	public:
+		Comms_Mock() : Comms(){}
+
+};
+
+class CommsUnitTest : public ::testing::Test {
+	protected:
+		virtual void SetUp() {
+		}
+
+		virtual void TearDown() {
+		// Code here will be called immediately after each test
+		// (right before the destructor).
+		}
+	private:
+		Comms_Mock comms;
+};
+
+TEST(CommsUnitTest, DefaultConstructor)
+{
+	EXPECT_TRUE(true);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+/***********************************************************************************************
 #include "comms.h"
 #if __linux
 	#include "unixsockets.h"
@@ -32,3 +74,4 @@ OnReceiveDatagram Comms::onReceiveData(const char *rx, int len, void *udata)
 
 	return 0;
 }
+*/

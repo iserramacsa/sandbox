@@ -9,7 +9,7 @@ class MPrinterManager
 {
 	public:
 		MPrinterManager();
-		~MPrinterManager();
+		~MPrinterManager(){};
 		void addPrinterAt(std::string ip, int port);
 		int getNumPrinters();
 		MPrinter * getPrinter(int idx);

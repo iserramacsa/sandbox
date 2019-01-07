@@ -7,9 +7,9 @@ class MCommand;
 class MProtocolClient
 {
 	public:
-		MProtocolClient();
-		~MProtocolClient();
-		MCommand * getCommand(std::string cmd);
+		MProtocolClient(){};
+		~MProtocolClient(){};
+		MCommand * getCommand(std::string cmd){};
 
 };
 

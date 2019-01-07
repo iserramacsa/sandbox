@@ -35,8 +35,9 @@ bool MCLient::getFilesList(int printer, std::vector<std::string> filesList, std:
 {
 	if (printer >= 0 && printer < getNumPrinters()) {
 		MPrinter* mprinter = _printers.getPrinter(printer);
-		mprinter->getFilesList(filesList, extensions);
-		return false;
+		if(mprinter){
+			//		mprinter->getFilesList(filesList, extensions);
+		}
 	}
 
 	return false;

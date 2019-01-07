@@ -2,6 +2,7 @@
 #define _UNIX_SOCKET_H
 
 #include "abstractsocket.h"
+#include <sys/socket.h>
 
 class ClientUnixSocket : public AbstractClientSocket
 {
@@ -13,6 +14,10 @@ class ClientUnixSocket : public AbstractClientSocket
 		virtual bool send(const char* tx);
 		virtual bool receive(char& rx, int timeout = DEFAULT_TIMEOUT);
 		virtual bool connectTo(const char* address, int port);
+
+	protected:
+		virtual bool connectToServer(int fd, struct sockaddr *addr);
+		bool isValidConnectionData(const char* address, int port);
 
 	private:
 		bool _opened;
