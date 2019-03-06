@@ -2,3 +2,5 @@ HPSmartCard
 RipperSDL2
 truetypefontsSDL
 utils
+
+**/CMakeLists.txt.user
