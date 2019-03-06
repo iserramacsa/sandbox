@@ -1,0 +1,738 @@
+<MACSA_TIJ_PROTOCOL>
+
+	<ABOUT_THIS_FILE>
+	Main Brains: José Antonio Bou and Marc Soleda
+	Validated By: José Antonio Bou and Marc Soleda
+	Implemented By: Nico Mesas
+	Today date: 2017/jun/28
+
+	This file is for describe the protocol for TIJ project Version1.
+
+	IMPORTAT: The "WIND" sections are the REAL protocol. All other XML tags outside from WIND sections are
+		ONLY documentation to facilitate the documentation of the protocol
+		
+	This XML File have 4 sections:
+
+	DATA_TYPES tag: this section contains types, names and descriptions for all variable data in the other section.
+					Is more convenient compacts all these descriptions in a single section because
+					many variables are in more than one places.
+
+	FILES_PROTOCOL tag: contains all command descriptions for tij-files-protocol. This sub-protocol is intended
+						to be used in other projects, so it is documented and implemented separately
+
+	ALL_PROTOCOL tag: this section contains all command description for tij-status and tij-configuration and
+						other related messages.
+
+	LIVE_PROTOCOL tag: this section contains the information about LIVE command
+
+	</ABOUT_THIS_FILE>
+
+	<DATA_TYPES>
+		<!-- WARNING: BOOL values must be string literals "true" or "false" -->
+
+		<FIELD Type="UINT"   	Name="[Command ID]" Info="Unsigned int to link the command send with the response" />
+		<FIELD Type="UINT"   	Name="[Error Code]" Info="Error Code: Integer with the error code. NOTE: Depending the error, the MAIN element maybe returned empty " />
+		<FIELD Type="STRING" 	Name="[Logical File Path]" Info="The logical File path for a physical file (see description section of FILE_PROTOCOL" />
+        <FIELD Type="STRING"    Name="[Logical Active Unit Name]" Info="Name of active drive on server. This must be '//' or 'USB//' " />
+		<FIELD Type="STRING" 	Name="[File Content]" Info="Content of file codified in base64" />
+		<FIELD Type="ENUM"   	Name="[Message Type]" Info="String with the type of file">
+			<VALID_VALUE id="Message" Description="For message files"/>
+			<VALID_VALUE id="Configuration" Description="For configuration files"/>
+			<VALID_VALUE id="Application" Description="For applications files (For example, the printer software)"/>
+			<VALID_VALUE id="Firmware" Description="For firmware application files (For example, the FPGA firmware in the SM200 case)"/>
+		</FIELD>
+		<FIELD Type="STRING" 	Name="[User Field Name]" Info="String with the name of the user field" />
+		<FIELD Type="STRING" 	Name="[User Field Value]" Info="String with the name of the user value" />
+		<FIELD Type="DATETIME"	Name="[Date Time]" Info="Format ddMMyyyyHHmmss" />
+		<FIELD Type="STRING"	Name="[Firmware controller]" Info="string that contains the firmware controller version" />
+		<FIELD Type="STRING"	Name="Firmware FPGA]" Info="string that contains the firmware fpga version" />
+		<FIELD Type="STRING"	Name="[API Version]" Info="string that contains the API version" />
+		<FIELD Type="DOUBLE"	Name="[Speed Value]" Info="Decimal value with one digit precision and the '.' as separator" />
+		<FIELD Type="UINT"		Name="[Board Id]" Info="Unsigned char with the index value" />
+		<FIELD Type="STRING"	Name="[Board Type]" Info="literal string SM190, SM200, ..." />
+		<FIELD Type="BOOL"		Name="[Printing Status]" Info="True whether the printhead(board) is printing or False otherwise" />
+        <FIELD Type="BOOL"      Name="[Autostart value]" Info="Enable printer when its power-on" />
+		<FIELD Type="BOOL"		Name="[Printhead Enabled]" Info="True=Automatic mode. False=Manual mode" />
+		<FIELD Type="STRING"	Name="[Counter Id]" Info="Name of the counter. Can be 'BCD.01' etc " />
+		<FIELD Type="UINT"		Name="[Counter Value]" Info="" />
+		<FIELD Type="UINT"		Name="[Total Counter]" Info="Total Counter of the printhead (board)" />
+
+        <FIELD Type="Enum"		Name="[BcdMode value]" Info="Defines the Bcd Mode">
+            <VALID_VALUE id="Mode0" Description="Manual - NO bcd Mode" />
+            <VALID_VALUE id="Mode1" Description="Bcd selects only the inputs 0-3 current message" />
+            <VALID_VALUE id="Mode2" Description="Bcd selects only the inputs 0-2 current message, and input 3 and strobe selects print direcction" />
+        </FIELD>
+
+        <FIELD Type="UINT"		Name="[BCD Value]" Info="Unsigned char with the decimal value" />
+		<FIELD Type="ENUM"		Name="[Printer Error Type]" Info="">
+            <VALID_VALUE id="Information" Description="¿?" />
+            <VALID_VALUE id="Warning" Description="Warnings are notification just for information" />
+            <VALID_VALUE id="Error" Description="Errorrs doesn't permit to print as they make a print stop status" />
+		</FIELD>
+        <FIELD Type="UINT"		Name="[Printer Error Priority]" Info="Ordinal number that defines the severity of the error message" />
+        <FIELD Type="STRING"	Name="[Printer Error Code]" Info="Unique alphanumeric code for that error" />
+		
+		<FIELD Type="UINT"		Name="[Input Id]" Info="" />
+		<FIELD Type="STRING"	Name="[Input Descriptor]" Info="" />
+		<FIELD Type="BOOL"		Name="[Input Value]" Info="" />
+		
+		<FIELD Type="UINT"		Name="[Output Id]" Info="" />
+		<FIELD Type="STRING"	Name="[Output Descriptor]" Info="" />
+		<FIELD Type="BOOL"		Name="[Output Value]" Info="" />
+		
+		<FIELD Type="STRING"	Name="[Property Key]" Info="Any Text" />
+		<FIELD Type="STRING"	Name="[Property Values]" Info="the value depends on the key" />
+		
+		<FIELD Type="UINT"		Name="[Adapter id]" Info="" />
+		<FIELD Type="STRING"	Name="[Ip Address]" Info="Ip Address = X.X.X.X (If DHCP disabled)" />
+		<FIELD Type="STRING"	Name="[Subnet Mask]" Info="Subnet Mask = X.X.X.X" />
+		<FIELD Type="STRING"	Name="[Gateway]" Info="Gateway = X.X.X.X" />
+		<FIELD Type="BOOL"		Name="[DHCP Value]" Info="" />
+		<FIELD Type="STRING"	Name="[HostName]" Info="string with the host name" />
+		<FIELD Type="UINT"		Name="[TCP Port]" Info="TCP Port: Integer value" />
+		<FIELD Type="STRING"	Name="[BlueTooth Device Name]" Info="Device Name: string with the device name" />
+		<FIELD Type="BOOL"		Name="[BlueTooth Visibility]" Info="" />
+		<FIELD Type="STRING"	Name="[BlueTooth Password]" Info="" />
+		<FIELD Type="ENUM"		Name="[Encoder Mode]" Info="Current encoder mode">
+			<VALID_VALUE id="FixedSpeed" Description="" />
+			<VALID_VALUE id="Internal" Description="" />
+			<VALID_VALUE id="External" Description="" />
+		</FIELD>
+		<FIELD Type="DOUBLE"	Name="[FixedSpeed Value]" Info="Decimal value with one digit precision and the '.' as separator" />
+		<FIELD Type="UINT"		Name="[ExternalResolution Value]" Info="Encoder Pulses: Unsigned integer" />
+		<FIELD Type="DOUBLE"	Name="[ExternalDiameter Value]" Info="Decimal value with one digit precision and the '.' as separator" />
+		<FIELD Type="ENUM"		Name="[Photocell Type]" Info="">
+			<VALID_VALUE id="FTC1" Description="" />
+			<VALID_VALUE id="FTC2" Description="" />
+			<VALID_VALUE id="FTCEXT" Description="" XYDebugSetupPrinthead="23  De moment només interna o externa" />
+		</FIELD>
+		<FIELD Type="STRING"	Name="[BCD code]" Info="Unsigned char with the bcd code" />
+		<FIELD Type="ENUM"		Name="[Print Direction Value]" Info="" XYDebugSetupPrinthead="1">
+			<VALID_VALUE id="LR" Description="Left To Rigth" />
+			<VALID_VALUE id="RL" Description="Right To Left" />
+			<VALID_VALUE id="ID" Description="Input depends" />
+		</FIELD>
+		<FIELD Type="BOOL"		Name="[Inverted Value]" Info="" />
+		<FIELD Type="UINT"		Name="[Delay Value]" Info="Unsinged int to define the print delay value" />
+		<FIELD Type="UINT"		Name="[Delay Units]" Info="Unsinged int to define the print delay units">
+			<VALID_VALUE id="mm" Description="Milimeters" />
+			<VALID_VALUE id="ms" Description="Miliseconds" />
+		</FIELD>
+
+		<FIELD Type="ENUM"		Name="[Input Config Value]" Info="">
+			<VALID_VALUE id="Edge" Descriptor="" />
+			<VALID_VALUE id="State" Descriptor="" />
+		</FIELD>
+
+		<FIELD Type="BOOL"		Name="[Input Inverted Value]" Info="" />
+		<FIELD Type="UINT"		Name="[Input Filter Value]" Info="Unsigned int to define the input filter in milliseconds" />
+		<FIELD Type="ENUM"		Name="[Output Type]" Info="">
+			<VALID_VALUE id="State"    Descriptor="Set the output state. The output remain in this state until the state would be changed. The TIME configuration is not taken into consideration." />
+			<VALID_VALUE id="OnPulse"  Descriptor="The output change the state to ON, waits the time specified and return to OFF." />
+			<VALID_VALUE id="OffPulse" Descriptor="The output change the state to OFF, waits the time specified and return to ON." />
+			<VALID_VALUE id="MaxOn"    Descriptor="The behaviour is the same as the 'State' type, except the electronics takes the time as maximum to mantain the output in ON state, afterwards the output returns to OFF." />
+			<VALID_VALUE id="MaxOff"   Descriptor="The behaviour is the same as the 'State' type, except the electronics takes the time as maximum to mantain the output in OFF state afterwards the output returns to ON." />
+		</FIELD>
+		<FIELD Type="UINT"		Name="[Output Time value]" Info="Unsigned integer that represents the milliseconds" />
+		<FIELD Type="BOOL"		Name="[Initial Value]" Info="" />
+
+		<FIELD Type="BOOL"		Name="[StatusChanged Value]"	Info="see LIVE_PROTOCOL section" />
+		<FIELD Type="BOOL"		Name="[ConfigChanged Value]"	Info="see LIVE_PROTOCOL section" />
+		<FIELD Type="BOOL"		Name="[Files Changed]"			Info="see LIVE_PROTOCOL section" />
+        <FIELD Type="BOOL"      Name="[Have Errors]"            Info="see LIVE_PROTOCOL section" />
+
+	</DATA_TYPES>
+		
+	<FILES_PROTOCOL>
+		<DESCRIPTION>
+
+			This protocol works with "Logical File Paths"
+			This protocol NOT define any drives in the device.
+			The drives definition depends to the device implementation, NOT FROM the protocol.
+
+			A logical filepath are the name of a file relative to a physical linux/unix directory.
+
+			The implementation MUST have to define how maping logical paths to physical paths, but this protocol NEVER works with
+			physical paths.
+			
+			By example, TIJ device have 2 logical drives: "internal drive" and "usb drive".
+			The implementation of the TIJ protocol for the real TIJ device must have a physical directory in filesystem to be the
+			"root" directory for the "internal drive", by example "~/internal_drive/".
+			
+			For the "usb drive" is exactly the same.
+			
+			Every logical drive must have a name, and this name can be an empty name.
+
+			For example, in the test implementation of the server, I have defined these drives:
+
+			files.addDrive("", "/home/magnetiq/Baixades/test-neoinkjet/_interna" );
+			files.addDrive("USB", "/home/magnetiq/Baixades/test-neoinkjet/_usb" );
+
+			The first line defines the internal drive. The second line defines a simulation of plugged USB.
+			
+			By example if Files in physical directory "/home/magnetiq/Baixades/test-neoinkjet/_interna" are
+					/home/magnetiq/Baixades/test-neoinkjet/_interna/uno.xml
+					/home/magnetiq/Baixades/test-neoinkjet/_interna/dos.xml
+					/home/magnetiq/Baixades/test-neoinkjet/_interna/tres.xml
+					/home/magnetiq/Baixades/test-neoinkjet/_usb/in_usb_0.xml
+					/home/magnetiq/Baixades/test-neoinkjet/_usb/in_usb_1.xml
+					/home/magnetiq/Baixades/test-neoinkjet/_usb/in_usb_2.xml
+					/home/magnetiq/Baixades/test-neoinkjet/_usb/in_usb_3.xml
+			The protocol maps this files to
+					//uno.xml
+					//dos.xml
+					//tres.xml
+					USB//in_usb_0.xml
+					USB//in_usb_1.xml
+					USB//in_usb_2.xml
+					USB//in_usb_3.xml
+
+			In short, it is the implementation that defines the prefix that identifies the logical drive.
+			This implementation can be as sophisticated as we want, even on devices	USB could put the LABEL
+			of the same, to be windows users friendly
+
+		/** 2018-06-05 Update **/
+			In order to get diferent kind of files, the GETMESSAGELIST command is changed to GETFILESLIST and a type attribute is
+			added in the GETFILESLIST to know what kind of files are requested. Maybe this attribute can be set with the expected extensions
+			In the first iteration the type attribute is a comma separated string with the expected extensions.
+			ex:
+			type=".nisx"
+			type=".ttf"
+			type=".bmp,.jpg,.png"
+
+		</DESCRIPTION>
+
+
+		<!-- GETMESSAGELIST -->
+		<COMMAND Name="GETFILESLIST">
+			<SEND>
+				<WIND id="[Command ID]">
+    				<GETFILESLIST type="[type]"/>
+				</WIND> 
+			</SEND>
+			<RESPONSE>
+				<WIND id="[Command ID]">
+					<ERROR Code="[Error Code]"/>
+					<GETFILESLIST type="[type]">
+                        <UNIT Name="[Logical Active Unit Name]"/> <!-- one item for each active drive -->
+                        <FILE Path="[Logical File Path]"/> <!-- one item for each file-->
+					</GETFILESLIST>
+				</WIND>
+			</RESPONSE>
+		</COMMAND>	
+
+		<!-- COPYFILE -->
+		<COMMAND Name="COPYFILE">
+			<SEND>
+				<WIND id="[Command ID]">
+    				<COPYFILE SourceFilePath="[Logical File Path]" TargetFilePath="[Logical File Path]"/>
+				</WIND> 
+			</SEND>
+			<RESPONSE>
+				<WIND id="[Command ID]">
+					<ERROR Code="[Error Code]"/>
+					<COPYFILE/>
+				</WIND> 
+
+			</RESPONSE>
+		</COMMAND>	
+		
+		<!-- MOVEFILE -->
+		<COMMAND Name="MOVEFILE">
+			<SEND>
+				<WIND id="[Command ID]">
+					<MOVEFILE SourceFilePath="[Logical File Path]" TargetFilePath="[Logical File Path]"/>
+				</WIND> 
+			</SEND>
+			<RESPONSE>
+				<WIND id="[Command ID]">
+					<ERROR Code="[Error Code]"/>
+					<MOVEFILE/>
+				</WIND> 
+			</RESPONSE>
+		</COMMAND>	
+		
+		<!-- DELETEFILE -->
+		<COMMAND Name="DELETEFILE">
+			<SEND>
+				<WIND id="[Command ID]">
+					<DELETEFILE FilePath="[Logical File Path]"/>
+				</WIND> 
+			</SEND>
+			<RESPONSE>
+				<WIND id="[Command ID]">
+					<ERROR Code="[Error Code]"/>
+					<DELETEFILE/>
+				</WIND> 
+			</RESPONSE>
+		</COMMAND>	
+
+		<!-- GETFILE  -->
+		<COMMAND Name="GETFILE">
+			<SEND>
+				<WIND id="[Command ID]">
+					<GETFILE FilePath="[Logical File Path]"/>
+				</WIND> 
+			</SEND>
+			<RESPONSE>
+				<WIND id="[Command ID]">
+					<ERROR Code="[Error Code]"/>
+					<GETFILE FilePath="[Logical File Path]">
+						<CONTENT>[File Content]</CONTENT>
+					</GETFILE>
+				</WIND> 
+			</RESPONSE>
+		</COMMAND>	
+
+		<!-- SETFILE -->
+		<COMMAND Name="SETFILE">
+			<SEND>
+				<WIND id="[Command ID]">
+					<SETFILE FilePath="[Logical File Path]" Type="[Message Type]">
+						<CONTENT>[File Content]</CONTENT>
+					</SETFILE>
+				</WIND> 
+			</SEND>
+			<RESPONSE>
+				<WIND id="[Command ID]">
+					<ERROR Code="[Error Code]"/>
+					<SETFILE FilePath="[Logical File Path]"/>
+				</WIND> 
+			</RESPONSE>
+		</COMMAND>	
+
+		<!-- GETMESSAGEVALUES -->
+		<COMMAND Name="GETMESSAGEVALUES">
+			<SEND>
+				<WIND id="[Command ID]">
+					<GETMESSAGEVALUES FilePath="[Logical File Path]"/>
+				</WIND> 
+			</SEND>
+			<RESPONSE>
+				<WIND id="[Command ID]">
+					<ERROR Code="[Error Code]"/>
+					<GETMESSAGEVALUES FilePath="[Logical File Path]">
+						<UI_FIELD Name="[User Field Name]" Value="[User Field Value]"/>
+					</GETMESSAGEVALUES>
+				</WIND> 
+			</RESPONSE>
+		</COMMAND>	
+	
+		<!-- SETMESSAGEVALUES -->
+		<COMMAND Name="SETMESSAGEVALUES">
+			<SEND>
+				<WIND id="[Command ID]">
+					<SETMESSAGEVALUES FilePath="[Logical File Path]">
+						<UI_FIELD Name="[User Field Name]" Value="[User Field Value]"/>
+					</SETMESSAGEVALUES>
+				</WIND> 
+			</SEND>
+			<RESPONSE>
+				<WIND id="[Command ID]">
+					<ERROR Code="[Error Code]"/>
+					<SETMESSAGEVALUES/>
+				</WIND> 
+			</RESPONSE>
+		</COMMAND>	
+
+	</FILES_PROTOCOL>
+
+	<ALL_PROTOCOL>
+
+		<!-- STATUS -->
+		<COMMAND Name="STATUS">
+			<SEND>
+				<WIND id="[Command ID]">
+					<STATUS/>
+				</WIND> 
+			</SEND>
+			<RESPONSE>
+				<WIND id="[Command ID]">
+					<ERROR Code="[Error Code]"/>
+					<STATUS>
+						<DATETIME>[Date Time]</DATETIME>
+						<VERSIONS>
+							<CONTROLLER>[Firmware controller]</CONTROLLER>
+							<FPGA>[Firmware FPGA]</FPGA>
+							<API>[API Version]</API>
+						</VERSIONS>
+						<BOARDS>
+							<BOARD id="[Board Id]">
+								<TYPE>[Board Type]</TYPE>
+								<PRINTING>[Printing Status]</PRINTING>
+								<ENABLED>[Printhead Enabled]</ENABLED>
+                                <CURRENT_MESSAGE FilePath="[Logical File Path]"/>
+                                <BCD_MODE>[BcdMode value]</BCD_MODE>
+                                <BCD_STATUS>[BCD Value]</BCD_STATUS>
+                                <COUNTERS>
+									<COUNTER id="[Counter Id]" Value="[Counter Value]"/>
+									<!-- SAMPLE INPUTS TO TIJ PROJECT
+									<COUNTER id="BCD.0" Value="[Counter Value]"/>
+									..
+									<COUNTER id="BCD.15" Value="[Counter Value]"/>
+									<COUNTER id="SYSTEM.TOTAL" Value="[Counter Value]"/>
+									<COUNTER id="SYSTEM.USER" Value="[Counter Value]"/>
+									-->
+								</COUNTERS>
+								<ERRORS>
+									<!-- Field description
+                                        See DATA_TYPES section
+                                        See related documentation for list of error codes & its priority
+                                        Sample errors
+											<ERROR Type="ERROR" Priority="1" ErrorCode="PCA.NOTDETECTED"/>
+											<ERROR Type="ERROR" Priority="2" ErrorCode="PH.OVERTEMP"/>
+									-->
+									<ERROR Type="[Printer Error Type]" Priority="[Printer Error Priority]" ErrorCode="[Printer Error Code]"/>
+								</ERRORS>
+								<INPUTS>
+									<INPUT id="[Input Id]" Descriptor="[Input Descriptor]" Value="[Input Value]"/>
+									<!-- SAMPLE INPUTS TO TIJ PROJECT
+										<INPUT id="0" Descriptor="FTC1" Value="[Value]"/>
+										<INPUT id="1" Descriptor="FTC2" Value="[Value]"/>
+										<INPUT id="2" Descriptor="FTC_EXT" Value="[Value]"/>
+										<INPUT id="3" Descriptor="BCD_B0" Value="[Value]"/>
+										<INPUT id="4" Descriptor="BCD_B1" Value="[Value]"/>
+										<INPUT id="5" Descriptor="BCD_B2" Value="[Value]"/>
+										<INPUT id="6" Descriptor="BCD_B3" Value="[Value]"/>
+										<INPUT id="7" Descriptor="BCD_STB" Value="[Value]"/>
+										<INPUT id="8" Descriptor="BUTTON1" Value="[Value]"/>
+										<INPUT id="9" Descriptor="BUTTON2" Value="[Value]"/>
+										<INPUT id="10" Descriptor="BUTTON3" Value="[Value]"/>
+									-->
+								</INPUTS>
+								<OUTPUTS>
+									<OUTPUT id="[Output Id]" Descriptor="[Output Descriptor]" Value="[Output Value]"/>
+									<!-- SAMPLE OUTPUTS TO TIJ PROJECT
+										<OUTPUTS id="0" Descriptor="SHUTTER" Value="[Value]"/>
+									-->
+								</OUTPUTS>
+								<PROPERTIES>
+									<PROPERTY Key="[Property Key]" Value="[Property Values]"/>
+									<!-- SAMPLE PROPERTIES FOR TIJ PROJECT		
+									HeaderTypeValue: string that contains the printhead type
+										 Available values:
+											a. HP
+											b. Seiko508GS
+											c. Xaar501_2
+											d. KM1024
+									
+									<PROPERTY Key="GENERAL.CURRENT_PRINT_SPEED" Value="[Actual print speed]"/>
+									<PROPERTY Key="GENERAL.NUM_PRINTS_REMAIN" Value="[Num prints remaining for actual message+resolution+inklevel]"/>
+									<PROPERTY Key="GENERAL.PROD_RATE" Value="[Actual production rate in prods/hour]"/>
+									<PROPERTY Key="GENERAL.HeaderType" Value="[HeaderTypeValue]"/>
+									-- Ink Level = Unsigned integer, from 0 to 100 in order to represent the percentage 
+									<PROPERTY Key="InkLevel" Value="[Ink Level]"/>	
+									-- HP SPECIFIC --
+									-- All the next 'Value's must take as string 
+									<PROPERTY Key="HP.UD0_CARTRIDGE_MFG" Value="[Value]"/>	
+									<PROPERTY Key="HP.UD1_INK_FILL" Value="[Value]"/>	
+									<PROPERTY Key="HP.PRINTER_1ST_INSTALL" Value="[Value]"/>	
+									<PROPERTY Key="HP.UD3_TRADEMARK" Value="[Value]"/>	
+									<PROPERTY Key="HP.UD7_OEM_ID" Value="[Value]"/>	
+									<PROPERTY Key="HP.DI8_REORDER_PN" Value="[Value]"/>	
+									<PROPERTY Key="HP.DRIVE_BOARD_TEMP" Value="[Value]"/>	
+									<PROPERTY Key="HP.CARTRIDGE_TEMP" Value="[Value]"/>	
+									<PROPERTY Key="HP.PRINTHEAD_FIRMWARE" Value="[Value]"/>	
+									<PROPERTY Key="HP.LIBRARY_VERSION" Value="[Value]"/>	
+									-->
+								</PROPERTIES>
+							</BOARD>
+						</BOARDS>
+					</STATUS>
+				</WIND> 
+
+			</RESPONSE>
+		</COMMAND>	
+	
+		<!-- GETCONFIGURATION -->
+		<COMMAND Name="GETCONFIGURATION">
+			<SEND>
+				<WIND id="[Command Id]">
+					<GETCONFIGURATION/>
+				</WIND> 
+			</SEND>
+			<RESPONSE>
+				<WIND id="[Command Id]">
+					<ERROR ErrorCode="[Error Code]"/>
+					<GETCONFIGURATION>
+						<GENERAL>
+							<DATETIME>[Date Time]</DATETIME>
+                            <LOG traceErrors="[BOOL]" traceWarnings="[BOOL]" traceInfos="[BOOL]" saveErrors="[BOOL]" saveWarnings="[BOOL]" saveInfos="[BOOL]" traceComDetails="[BOOL]"/>
+						</GENERAL>
+						<CONNECTIONS>
+							<NETWORK>
+								<ADAPTER id="[Adapter Id]">
+									<IP_ADDRESS>[Ip Address]</IP_ADDRESS>
+									<SUBNET_MASK>[Subnet Mask]</SUBNET_MASK>
+									<GATEWAY>[Gateway]</GATEWAY>
+									<DHCP>[DHCP Value]</DHCP>
+									<HOSTNAME>[HostName]</HOSTNAME>
+									<TCP_PORT>[TCP Port]</TCP_PORT>
+								</ADAPTER>
+							</NETWORK>
+							<BLUETOOTH>
+								<DEVICE_NAME>[BlueTooth Device Name]</DEVICE_NAME>
+								<VISIBILITY>[BlueTooth Visibility]</VISIBILITY>
+								<PASSWORD>[BlueTooth Password]</PASSWORD>
+							</BLUETOOTH>
+						</CONNECTIONS>
+						<BOARDS>
+							<BOARD id="[Board Id]">
+								<TYPE>[Board Type]</TYPE>
+                                <AUTOSTART>[Autostart value]</AUTOSTART>
+								<ENABLED>[Printhead Enabled]</ENABLED>
+                                <CURRENT_MESSAGE>[Logical File Path]"</CURRENT_MESSAGE>
+                                <BCD_MODE>[BcdMode value]</BCD_MODE>
+                                <BCD_ASSIGNMENT>
+                                    <BCD Code="[BCD code]" FilePath="[Logical File Path]"/>
+                                </BCD_ASSIGNMENT>
+                                <PRINT_DIRECTION>[Print Direction Value]</PRINT_DIRECTION>
+                                <INVERTED>[Inverted Value]</INVERTED> <!-- Print rotated -->
+                                <DELAY Value="[Delay Value]" Units="[Delay Units]" />
+
+								<ENCODER CurrentMode="[Encoder Mode]" XYDebugSetupPrinthead="20" >
+									<FIXED_SPEED Value="[FixedSpeed Value]" XYDebugSetupPrinthead="25"/>
+									<EXTERNAL_ENCODER Resolution="[ExternalResolution Value]" XYDebugSetupPrinthead="26"
+													  Diameter="[ExternalDiameter Value]" XYDebugSetupPrinthead="27"/>
+								</ENCODER>
+								<PRODUCT_PHOTOCELL>[Photocell Type]</PRODUCT_PHOTOCELL>
+								<PROPERTIES>
+									<PROPERTY Key="[Property Key]" Value="[Property Values]"/>
+									<!-- SAMPLE PROPERTIES FOR TIJ PROJECT
+									<PROPERTY Key="HeaderType" Value="[HeaderTypeValue]"/>
+
+									-- SHUTTER.ENABLED.Value: True or False -
+									-- SHUTTER.TIME.Value: Unsigned integer that represents the milliseconds -
+									<PROPERTY Key="SHUTTER.ENABLED" Value="[Enabled value]"/>
+									<PROPERTY Key="SHUTTER.TIME" Value="[Time value]"/>
+
+									-- Res Value: Unsigned int to define the horizontal resolution in dpi -
+									-- NOTE: Only for SM190, at the moment--
+									<PROPERTY Key="HRES" Value="[Res Value]"  XYDebugSetupPrinthead="2"/>
+
+									-- NOTE: Only for SM200
+										PRINTMODE.Value: Define the print mode. The mode could be defined by intensity or resolution.
+											INTENSITY
+											RESOLUTION
+
+										PRINTMODE.INTENSITY.Value: Unsigned char. The available values are: 1, 2 or 3
+
+										PRINTMODE.RESOLUTION.MODE.Value:
+											0 = 180 dpi
+											1 = 300 dpi
+											2 = 600 dpi
+										PRINTMODE.RESOLUTION.PH.Value:
+											0 = Column 1 active
+											1 = Column 2 active
+											2 = Switch between columns every print
+										NOTE: For the ResMode = 2 the PHMode won't be taken it into consideration
+									--
+									<PROPERTY Key="PRINTMODE"				  Value="[Value]"/>
+									<PROPERTY Key="PRINTMODE.INTENSITY"	      Value="[Value]"/>
+									<PROPERTY Key="PRINTMODE.RESOLUTION.MODE" Value="[Value]"/>
+									<PROPERTY Key="PRINTMODE.RESOLUTION.PH"   Value="[Value]" XYDebugSetupPrinthead="18,19,Falta altre"/>
+									-->
+								</PROPERTIES>
+								***NEW***
+								<CARTIGE	id="[STRING]"				DebugSetupPrinthead="identificador de la marca del cartucho HP/FUNAI"
+											Voltage="[DOUBLE]"			XYDebugSetupPrinthead="21"
+											PulseWarming="[BOOL]"		XYDebugSetupPrinthead="22"
+											PulseWarmingTemp="[DOUBLE]"	XYDebugSetupPrinthead="37"
+											ColumnDistance="[UINT]"		XYDebugSetupPrinthead="24"
+											PulseWidth="[DOUBLE]"		DebugSetupPrinthead="*NEW*"
+											/>
+								***NEW***
+								<INPUTS>
+									<INPUT id="[Input Id]" Descriptor="[Input Descriptor]" Config="[Input Config Value]" Inverted="[Input Inverted Value]" Filter="[Input Filter Value]"/>
+									<!-- SAMPLE INPUTS TO TIJ PROJECT
+									<INPUT id="0"  Descriptor="FTC1"	Config="[Input Config Value]" Inverted="[Inv Value]" Filter="[Filter Value]" XYDebugSetupPrinthead="28,29,30"/>
+									<INPUT id="1"  Descriptor="FTC2"	Config="[Input Config Value]" Inverted="[Inv Value]" Filter="[Filter Value]" XYDebugSetupPrinthead="31,32,33"/>
+									<INPUT id="2"  Descriptor="FTC_EXT"	Config="[Input Config Value]" Inverted="[Inv Value]" Filter="[Filter Value]" XYDebugSetupPrinthead="34,35,36"/>
+									<INPUT id="3"  Descriptor="B0"		Config="[Input Config Value]" Inverted="[Inv Value]" Filter="[Filter Value]" XYDebugSetupPrinthead="3,4,5" />
+									<INPUT id="4"  Descriptor="B1"		Config="[Input Config Value]" Inverted="[Inv Value]" Filter="[Filter Value]" XYDebugSetupPrinthead="6,7,8"/>
+									<INPUT id="5"  Descriptor="B2"		Config="[Input Config Value]" Inverted="[Inv Value]" Filter="[Filter Value]" XYDebugSetupPrinthead="9,10,11"/>
+									<INPUT id="6"  Descriptor="B3"		Config="[Input Config Value]" Inverted="[Inv Value]" Filter="[Filter Value]" XYDebugSetupPrinthead="12,13,14"/>
+									<INPUT id="7"  Descriptor="STB"		Config="[Input Config Value]" Inverted="[Inv Value]" Filter="[Filter Value]" XYDebugSetupPrinthead="15,16,17"/>
+									<INPUT id="8"  Descriptor="BUTTON1"	Config="[Input Config Value]" Inverted="[Inv Value]" Filter="[Filter Value]" />
+									<INPUT id="9"  Descriptor="BUTTON2"	Config="[Input Config Value]" Inverted="[Inv Value]" Filter="[Filter Value]" />
+									<INPUT id="10" Descriptor="BUTTON3"	Config="[Input Config Value]" Inverted="[Inv Value]" Filter="[Filter Value]" />
+									-->
+								</INPUTS>
+								<OUTPUTS>
+									<OUTPUT id="[Output Id]" Descriptor="[Output Descriptor]" Type="[Output Type]" Time="[Output Time value]" InitialValue="[Initial Value]"/>
+									<!--
+										NOTE: For Pulses state. It doesn't matter the initial output value.
+											   For example if we have configured the OnPulse and the output state is OFF,
+											   due to a output reconfiguration, for example, the process would be the next:
+											   1.- The output is set to ON although the output status is ON
+											   2.- Wait the configured time
+											   3.- The output is set to OFF.
+
+											   The same action will be performed for the OffPulse
+									-->
+									<!-- SAMPLES OUTPUT TO TIJ PROJECT
+									<OUTPUT id="0" Descriptor="SHUTTER" Type="[Output Type]" Time="[Time value]" InitialValue="[Initial Value]" />
+									-->
+								</OUTPUTS>
+							</BOARD>
+						</BOARDS>
+                    </GETCONFIGURATION>
+				</WIND> 
+			</RESPONSE>
+		</COMMAND>	
+
+		<!-- SETCONFIGURATION -->
+		<COMMAND Name="SETCONFIGURATION">
+			<SEND>
+				<WIND id="[Command Id]">
+					<SETCONFIGURATION>
+						<!-- EXACTLY THE SAME CONTENTS OF GETCONFIGURATION COMMAND -->
+					</SETCONFIGURATION>
+				</WIND>
+			</SEND>
+			<RESPONSE>
+				<WIND id="[Command Id]">
+					<ERROR Code="[Error Code]" />
+					<SETCONFIGURATION/>
+				</WIND> 
+			</RESPONSE>
+		</COMMAND>	
+	
+		<!-- SETCURRENTMESSAGE -->
+		<COMMAND Name="SETCURRENTMESSAGE">
+			<SEND>
+				<WIND id="[Command Id]">
+					<SETCURRENTMESSAGE BoardId="[Board Id]" FilePath="[Logical File Path]"/>
+				</WIND> 
+			</SEND>
+			<RESPONSE>
+				<WIND id="[Command Id]">
+					<ERROR Code="[Error Code]"/>
+					<SETCURRENTMESSAGE/>
+				</WIND> 
+			</RESPONSE>
+		</COMMAND>	
+
+		<!-- SETCOUNTERS -->
+		<COMMAND Name="SETCOUNTERS">
+			<SEND>
+				<WIND id="[Command Id]">
+					<SETCOUNTERS>
+						<COUNTER BoardId="[Board Id]" CounterId="[Counter Id]" Value="[Counter Value]"/>
+					</SETCOUNTERS>
+				</WIND> 
+			</SEND>
+			<RESPONSE>
+				<WIND id="[Command Id]">
+					<ERROR Code="[Error Code]"/>
+					<SETCOUNTERS/>
+				</WIND> 
+			</RESPONSE>
+		</COMMAND>	
+	
+		<!-- SETOUTPUT; This operation is only valid when STATUS.ENABLED=FALSE-->
+		<COMMAND Name="SETOUTPUT">
+			<SEND>
+				<WIND id="[Command Id]">
+					<SETOUTPUT>
+						<OUTPUT BoardId="[Board Id]" OutputId="[Output Id]" Value="[Output Value]"/>
+					</SETOUTPUT>
+				</WIND> 
+             </SEND>
+            <RESPONSE>
+                <WIND id="[Command Id]">
+                    <ERROR Code="Error Code"/>
+                    <SETOUTPUT/>
+                </WIND>
+            </RESPONSE>
+		</COMMAND>	
+	
+		<!-- SETINPUT; This operation is only valid when STATUS.ENABLED=TRUE-->
+		<COMMAND Name="SETINPUT">
+			<SEND>
+				<WIND id="[Command Id]">
+					<SETINPUT>
+						<INPUT BoardId="[Board Id]" InputId="[Output Id]" Value="[Input Value]"/>
+					</SETINPUT>
+				</WIND> 
+            </SEND>
+            <RESPONSE>
+                <WIND id="[Command Id]">
+                    <ERROR Code="Error Code"/>
+                    <SETINPUT/>
+                </WIND>
+            </RESPONSE>
+		</COMMAND>	
+
+		<!-- SETBCDVALUE; This operation is only valid when STATUS.ENABLED=TRUE-->
+		<COMMAND Name="SETBCDVALUE">
+			<SEND>
+				<WIND id="[Command Id]">
+					<SETBCDVALUE BoardId="[Board Id]"  Value="[BCD Value]"/>
+				</WIND> 
+			</SEND>
+			<RESPONSE>
+				<WIND id="[Command Id]">
+					<ERROR Code="Error Code"/>
+					<SETBCDVALUE/>
+				</WIND> 
+			</RESPONSE>
+		</COMMAND>	
+
+
+        <!-- GETERRORLOG -->
+        <COMMAND Name="GETERRORLOG">
+            <SEND>
+                <WIND id="[Command Id]">
+                    <GETERRORLOG/>
+                </WIND>
+            </SEND>
+            <RESPONSE>
+                <WIND id="[Command Id]">
+                    <ERROR Code="Error Code"/>
+                    <GETERRORLOG>
+                        <ITEM
+                            BoardId="[Board Id]"
+                            When="[Date-time]"
+                            Type="[Printer Error Type]"
+                            Priority="[Printer Error Priority]"
+                            ErrorCode="[Printer Error Code]"/>
+                    </GETERRORLOG>
+                </WIND>
+            </RESPONSE>
+        </COMMAND>
+	
+	</ALL_PROTOCOL>
+
+
+	<LIVE_PROTOCOL>
+		<DESCRIPTION>
+		This is a convenience protocol, with very short frames and easy and fast to interpret.
+		Its goal is to reduce network data traffic between the printer and the clients.
+		Typically, the client will send this command from time to time, for example every second. The server (the printer)
+		will respond with the current date and time (on the server) and with information on where there have been changes.
+		In response to this message, the client will act accordingly: 
+            if StatusChanged=true need to send the GETSTATUS command,
+            if ConfigChanged=true, need to send the GETCONFIGURATION command
+            if FilesChanged=true, need to send the GETFILESLIST command with ".nix" attribute
+            if FontsChanged=true, need to send the GETFILESLIST command with ".ttf" attribute
+            if HaveErros=true, the user interface can show an indicator (if printer is not active). If printer is active, UI need to send GETSTATUS command
+		</DESCRIPTION>
+
+		<SEND>
+			<WIND id="[Command Id]">
+				<LIVE/>
+			</WIND>
+		</SEND>
+
+		<RESPONSE>
+			<WIND id="[Command Id]">
+				<ERROR Code="Error Code"/>
+				<LIVE DateTime="[Date Time]" StatusChanged="[StatusChanged Value]" ConfigChanged="[ConfigChanged Value]" FilesChanged="[Files Changed]"  FontsChanged="[Files Changed]" HaveError="[Have Errors]"/>
+			</WIND>
+		</RESPONSE>
+
+	</LIVE_PROTOCOL>
+
+
+</MACSA_TIJ_PROTOCOL>
