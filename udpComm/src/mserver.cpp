@@ -1,5 +1,5 @@
 #include "mserver.h"
-#include "udpserver.h"
+#include "posix/udpserver.h"
 
 using namespace Macsa::Comms;
 
@@ -19,6 +19,7 @@ bool MServer::open(int port)
 
 	if (udpSocket == NULL) {
 		udpSocket = new UdpServerSocket(port);
+//		udpSocket = new UdpServerSocket("", 0);
 	}
 	if (udpSocket != NULL) {
 		open = udpSocket->open();

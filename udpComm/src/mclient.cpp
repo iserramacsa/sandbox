@@ -1,27 +1,31 @@
 #include "mclient.h"
-#include "udpclient.h"
+#include "posix/udpclientbcast.h"
 
 using namespace Macsa::Comms;
 
 MClient::MClient()
 {
-	udpSocket = NULL;
+	_udpSocket = NULL;
 }
 
 MClient::~MClient()
 {
-	delete udpSocket;
+	delete _udpSocket;
 }
 
 bool MClient::open(const char* svr, int port)
 {
 	bool open = false;
 
-	if (udpSocket == NULL) {
-		udpSocket = new UdpClientSocket(svr, port);
+	if (_udpSocket == NULL) {
+#if BCAST
+		_udpSocket = new BcastClientSocket(svr, port);
+#else
+		_udpSocket = new UdpClientSocket(svr, port);
+#endif
 	}
-	if (udpSocket != NULL) {
-		open = udpSocket->open();
+	if (_udpSocket != NULL) {
+		open = _udpSocket->open();
 	}
 
 	return open;
@@ -30,8 +34,8 @@ bool MClient::open(const char* svr, int port)
 bool MClient::close()
 {
 	bool closed = true;
-	if (udpSocket != NULL) {
-		closed = udpSocket->close();
+	if (_udpSocket != NULL) {
+		closed = _udpSocket->close();
 	}
 
 	return closed;
@@ -41,8 +45,8 @@ bool MClient::receive(std::string &msg, std::string &client)
 {
 	msg.clear();
 
-	if (udpSocket != NULL) {
-		udpSocket->receiveFrom(msg, client);
+	if (_udpSocket != NULL) {
+		_udpSocket->receiveFrom(msg, client);
 	}
 
 	return (msg.length() > 0);
@@ -52,8 +56,8 @@ bool MClient::send(const std::string &msg)
 {
 	bool sent = false;
 
-	if(udpSocket != NULL) {
-		sent = udpSocket->sendToServer(msg);
+	if(_udpSocket != NULL) {
+		sent = _udpSocket->sendToServer(msg);
 	}
 	return sent;
 }

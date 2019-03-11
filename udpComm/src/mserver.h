@@ -5,6 +5,7 @@
 
 namespace Macsa {
 	namespace Comms {
+		class BCastServerSocket;
 		class UdpServerSocket;
 		class MServer
 		{

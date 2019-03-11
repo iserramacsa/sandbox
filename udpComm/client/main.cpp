@@ -6,9 +6,6 @@ int main(int argc, char** argv)
 {
 	Macsa::Comms::MClient client;
 
-
-
-
 	client.open(argv[1], atoi(argv[2]));
 
 	int len = 5;

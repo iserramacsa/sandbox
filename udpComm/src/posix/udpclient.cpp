@@ -24,16 +24,14 @@ UdpClientSocket::~UdpClientSocket()
 	close();
 }
 
-#define USE_BROADCAST 0
 bool UdpClientSocket::open()
 {
 	if (!_opened) {
 		if (createSocket(_fdSocket)) {
-#if USE_BROADCAST
-			int soBroadcast = 1;
-			enableBroadcast(_fdSocket, SO_REUSEADDR, soBroadcast);
-#endif
 			_opened = initSocket(_svraddr, _server.c_str(), _port);
+		}
+		if(!_opened && _fdSocket != -1) {
+			close();
 		}
 	}
 

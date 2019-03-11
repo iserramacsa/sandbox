@@ -6,17 +6,21 @@ endif()
 
 set(SRC)
 
-add_subdirectory(posix)
+set(SRC ${SRC}
+	${CMAKE_CURRENT_SOURCE_DIR}/udpsocket.cpp
+	)
 
 if(SERVER)
 	set(SRC ${SRC}
-		${CMAKE_CURRENT_SOURCE_DIR}/mserver.cpp
+		${CMAKE_CURRENT_SOURCE_DIR}/udpserver.cpp
+		${CMAKE_CURRENT_SOURCE_DIR}/udpserverbcast.cpp
 		)
 endif()
 
 if(CLIENT)
 	set(SRC ${SRC}
-		${CMAKE_CURRENT_SOURCE_DIR}/mclient.cpp
+		${CMAKE_CURRENT_SOURCE_DIR}/udpclient.cpp
+		${CMAKE_CURRENT_SOURCE_DIR}/udpclientbcast.cpp
 		)
 endif()
 

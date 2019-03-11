@@ -17,9 +17,9 @@ namespace Macsa {
 				void setServer(std::string svr = "", int port = 0);
 			protected:
 				virtual bool sendTo(const std::string &msg, const std::string &addr);
-			private:
-				std::string _server;
 				struct sockaddr_in _svraddr;
+				std::string _server;
+			private:
 		};
 	}
 }

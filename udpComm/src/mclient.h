@@ -2,9 +2,10 @@
 #define _M_CLIENT_H
 
 #include <string>
-
+#define BCAST	1
 namespace Macsa {
 	namespace Comms {
+		class BcastClientSocket;
 		class UdpClientSocket;
 		class MClient
 		{
@@ -19,7 +20,11 @@ namespace Macsa {
 				bool send(const std::string &msg);
 
 			private:
-				UdpClientSocket* udpSocket;
+#if BCAST
+				BcastClientSocket* _udpSocket;
+#else
+				UdpClientSocket* _udpSocket;
+#endif
 		};
 	}
 }
