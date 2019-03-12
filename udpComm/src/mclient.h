@@ -13,18 +13,17 @@ namespace Macsa {
 				MClient();
 				~MClient();
 				bool open(const char *svr, int port);
+				bool openBcast(int port);
 				bool close();
 
 				bool receive(std::string &msg, std::string &client);
 				bool receive(std::string &msg);
 				bool send(const std::string &msg);
+				bool sendBCast(const std::string &msg);
 
 			private:
-#if BCAST
-				BcastClientSocket* _udpSocket;
-#else
+				BcastClientSocket* _bcastSocket;
 				UdpClientSocket* _udpSocket;
-#endif
 		};
 	}
 }

@@ -32,6 +32,7 @@ set(SOURCES ${SOURCES}
 	main.cpp
 )
 set(SERVER TRUE)
+set(CLIENT TRUE)
 add_subdirectory(${PROJECT_SOURCE_DIR}/src ${CMAKE_BINARY_DIR}/src)
 
 ##includes

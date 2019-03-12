@@ -13,6 +13,7 @@ namespace Macsa {
 
 				virtual bool receiveFrom(std::string &msg, std::string &addr);
 				virtual bool sendTo(const std::string &msg, const std::string &addr);
+
 		};
 	}
 }

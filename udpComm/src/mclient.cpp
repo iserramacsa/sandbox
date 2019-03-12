@@ -2,15 +2,18 @@
 #include "posix/udpclientbcast.h"
 
 using namespace Macsa::Comms;
+#define BCAST_ADDR	"255.255.255.255"
 
 MClient::MClient()
 {
 	_udpSocket = NULL;
+	_bcastSocket = NULL;
 }
 
 MClient::~MClient()
 {
 	delete _udpSocket;
+	delete _bcastSocket;
 }
 
 bool MClient::open(const char* svr, int port)
@@ -18,16 +21,24 @@ bool MClient::open(const char* svr, int port)
 	bool open = false;
 
 	if (_udpSocket == NULL) {
-#if BCAST
-		_udpSocket = new BcastClientSocket(svr, port);
-#else
 		_udpSocket = new UdpClientSocket(svr, port);
-#endif
 	}
 	if (_udpSocket != NULL) {
 		open = _udpSocket->open();
 	}
 
+	return open;
+}
+
+bool MClient::openBcast(int port)
+{
+	bool open = false;
+	if (_bcastSocket == NULL){
+		_bcastSocket = new BcastClientSocket(BCAST_ADDR, port);
+	}
+	if (_bcastSocket != NULL){
+		open = _bcastSocket->open();
+	}
 	return open;
 }
 
@@ -58,6 +69,16 @@ bool MClient::send(const std::string &msg)
 
 	if(_udpSocket != NULL) {
 		sent = _udpSocket->sendToServer(msg);
+	}
+	return sent;
+}
+
+bool MClient::sendBCast(const std::string &msg)
+{
+	bool sent = false;
+
+	if(_bcastSocket != NULL) {
+		sent = _bcastSocket->sendToServer(msg);
 	}
 	return sent;
 }

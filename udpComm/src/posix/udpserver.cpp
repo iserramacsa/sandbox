@@ -111,22 +111,17 @@ bool UdpServerSocket::receiveMsg(std::string& msg)
 
 bool UdpServerSocket::sendTo(const std::string &msg, const std::string &addr)
 {
-#ifdef DEBUG
-		std::cout << __func__ << " client " << addr << std::endl;
-#endif
-/*
-	//print details of the client/peer and the data received
-	printf("Received packet from %s:%d\n", inet_ntoa(si_other.sin_addr), ntohs(si_other.sin_port));
-	printf("Data: %s\n" , buf);
+	bool sent = false;
+	int flags = 0;
+	struct sockaddr_in client;
 
-	//now reply the client with the same data
-	if (sendto(s, buf, recv_len, 0, (struct sockaddr*) &si_other, slen) == -1)
-	{
+	if (initSocket(client, addr.c_str(), static_cast<short>(_port))) {
+		sent = (sendto(_fdSocket, msg.c_str(), msg.length(), flags, (struct sockaddr *) &client, sizeof (client)) != -1);
 #ifdef DEBUG
-		std::cout << __func__ << " => " << strerror(errno)<< std::endl;
+	std::cout << __func__ << " => " << strerror(errno)<< std::endl;
 #endif
+
 	}
-	*/
 
-	return false;
+	return sent;
 }

@@ -1,21 +1,34 @@
 #include <iostream>
 #include <thread>
 #include "mserver.h"
+#include "mclient.h"
+#include "unistd.h"
 
 int main(int argc, char** argv)
 {
 	Macsa::Comms::MServer server;
-	if (server.open(atoi(argv[1]))) {
-		int len = 5;
-		while (server.isOpened() && len--) {
-			std::string msg;
-			std::string client;
-			client.clear();
-			msg.clear();
+	short port = atoi(argv[1]);
+	if (server.open(port)) {
 
-			server.receive(msg, client);
+		std::string msg;
+		std::string client;
+		client.clear();
+		msg.clear();
 
-			std::cout << "** Received message: " << msg.c_str() << std::endl;
+		while (server.isOpened()){
+			if (server.receive(msg, client)) {
+				std::cout << "** Received message: " << msg.c_str() << std::endl;
+				std::cout << "** Client: " << client.c_str() << std::endl;
+
+				sleep(1);
+				Macsa::Comms::MClient udpClient;
+				if (udpClient.open(client.c_str(), port)) {
+					msg = "HELLO";
+					udpClient.send(msg);
+					server.close();
+				}
+			}
+
 		}
 	}
 
