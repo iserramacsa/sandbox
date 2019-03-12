@@ -70,3 +70,12 @@ bool MServer::receive(std::string &msg)
 	return (msg.length() > 0);
 }
 
+bool MServer::send(std::string &msg, const std::string &client)
+{
+	bool sent = false;
+	if(udpSocket != NULL) {
+		sent = udpSocket->sendTo(msg,client);
+	}
+	return sent;
+}
+

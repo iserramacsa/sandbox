@@ -1,21 +1,25 @@
 #include <iostream>
 #include <thread>
 #include "mserver.h"
+//#include "mclient.h"
 
-int main(int argc, char** argv)
+int main(void)
 {
 	Macsa::Comms::MServer server;
-	if (server.open(atoi(argv[1]))) {
-		int len = 5;
-		while (server.isOpened() && len--) {
+	//Macsa::Comms::MClient myClient;
+	uint i=0;
+	if (server.open(atoi("9090"))) {
+		while (server.isOpened()&& i<5) {
 			std::string msg;
-			std::string client;
-			client.clear();
+			std::string notMeClient;
+			std::string msgSend = "Soy server";
+			notMeClient.clear();
 			msg.clear();
-
-			server.receive(msg, client);
-
+			server.receive(msg, notMeClient);
+			std::cout << "** client: " << notMeClient.c_str() << std::endl;
 			std::cout << "** Received message: " << msg.c_str() << std::endl;
+			server.send(msgSend,notMeClient);
+			i++;
 		}
 	}
 
