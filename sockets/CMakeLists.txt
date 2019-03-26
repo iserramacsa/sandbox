@@ -52,9 +52,9 @@ set(SERVER_LIB "${PROJECT_NAME}Server")
 add_executable(${CLIENT_LIB} ${CLIENT})
 add_executable(${SERVER_LIB} ${SERVER})
 
-#target_link_libraries(${CLIENT_LIB}
-#	${EXTERNAL_LIBS}
-#	)
+target_link_libraries(${CLIENT_LIB}
+	pthread
+	)
 #target_link_libraries(${SERVER_LIB}
 #	${EXTERNAL_LIBS}
 #	)
