@@ -4,9 +4,9 @@
 
 #include "unixsocket.h"
 
-#define TEST_PORT_UDP	8080
+#define TEST_PORT_UDP	31415
 //#define TEST_PORT_TCP	9990
-#define BCAST_ADDR	"192.168.1.255"
+#define BCAST_ADDR	"255.255.255.255"
 
 #define UNUSED(x) (void)(x)
 
@@ -44,16 +44,16 @@ int main (int argc, char* argv[])
 		sleep(1);
 	}
 
-	sendBCastMessage("HELLO?");
+	sendBCastMessage("DISCOVER?");
 	{
 		std::unique_lock<std::mutex>lck(mtx);
 		cv.wait(lck);
 	}
-	sendBCastMessage("EXIT");
-	{
-		std::unique_lock<std::mutex>lck(mtx);
-		cv.wait(lck);
-	}
+//	sendBCastMessage("EXIT");
+//	{
+//		std::unique_lock<std::mutex>lck(mtx);
+//		cv.wait(lck);
+//	}
 /*
 	if (socket->connect("192.168.1.64", TEST_PORT_UDP)){
 		if(socket->send("HELLO?", "192.168.1.64")) {

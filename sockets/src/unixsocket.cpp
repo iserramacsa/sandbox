@@ -24,6 +24,8 @@ UnixSocket::UnixSocket(int port, nSocketType type) :
 {
 	_local.fd = -1;
 	if (createSocket(_local.fd, _type) && init()) {
+		int val = 1;
+		setSocketOption(_local.fd, SO_REUSEPORT, val);
 		_status = INITIATED;
 	}
 }
@@ -164,7 +166,7 @@ bool UnixSocket::receive(std::string &rx, std::string &addr, int timeout)
 			received = (::recvfrom(_local.fd, buff, DEFAULT_BUFF_SIZE, 0, (struct sockaddr*)&_remote.addr, &len) > 0);
 			if (received) {
 				rx = buff;
-				addr = inet_ntoa(_remote.addr.sin_addr);
+				addr = getAddress(_remote.addr);
 			}
 		}
 	}
@@ -213,7 +215,7 @@ bool UnixSocket::createSocket(int &fd, nSocketType type)
 	{
 		fd = socket(AF_INET, sockType, protocol);
 #ifdef DEBUG
-		if (errno != 0){
+		if (errno != 0) {
 			std::cout << __func__ << "(" << fd << ") => " << strerror(errno)<< std::endl;
 		}
 #endif
@@ -300,7 +302,7 @@ bool UnixSocket::setAddress(sockaddr_in &socket, const char *addr)
 		socket.sin_addr.s_addr = INADDR_ANY;
 	}
 #ifdef DEBUG
-	if (!success) {
+	if (errno != 0) {
 		std::cout << __func__ << " => " << strerror(errno)<< std::endl;
 	}
 #endif
@@ -314,13 +316,13 @@ void UnixSocket::clearSocket(sockaddr_in &socket)
 
 bool UnixSocket::setSocketOption(int &fd, int optName, int &optValue)
 {
-	bool result = (0 == setsockopt(fd, SOL_SOCKET, optName, &optValue, sizeof (optValue)));
+	bool success = (0 == setsockopt(fd, SOL_SOCKET, optName, &optValue, sizeof (optValue)));
 #ifdef DEBUG
-	if(!result){
+	if (errno != 0) {
 		std::cout << __func__ << " => " << strerror(errno)<< std::endl;
 	}
 #endif
-	return result;
+	return success;
 }
 
 bool UnixSocket::waitForRead(int fd, int timeout)
@@ -369,7 +371,7 @@ bool UnixSocket::connect(int fd, const sockaddr_in &socket)
 	success = (::connect(fd, (struct sockaddr*) &socket, sizeof (socket)) == 0);
 
 #ifdef DEBUG
-	if (!success){
+	if (errno != 0) {
 		std::cout << __func__ << " => " << strerror(errno)<< std::endl;
 	}
 #endif
@@ -377,11 +379,7 @@ bool UnixSocket::connect(int fd, const sockaddr_in &socket)
 	return success;
 }
 
-/*********************************************************************************************/
-UDPSocket::UDPSocket(int port) :
-	UnixSocket (port, UDP_SOCKET)
+std::string UnixSocket::getAddress(const sockaddr_in &socket) const
 {
-
+	return inet_ntoa(socket.sin_addr);
 }
-
-UDPSocket::~UDPSocket() {}

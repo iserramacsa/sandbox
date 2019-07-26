@@ -1,0 +1,89 @@
+#!/bin/sh
+
+TFTP_REMOTE_FILE="mli/mli-last.update"
+TFTP_LOCAL_FILE="/mli.update"
+
+KEY_FILE="/etc/update.key"
+TAR_FILE="/tmp/update.tar"
+
+IN_FILE="${1}"
+TFTP_SERVER="${2}"
+
+. /etc/default/messageFB.sh
+
+finish() {
+	/bin/rm -rf "${TAR_FILE}"
+	/bin/sync
+	stopMessages
+	sleep 1
+	/etc/rc.d/init.d/mli start
+	/etc/rc.d/init.d/gmli start
+	exit $1
+}
+
+panic() {
+	echo "${@}" >&2
+	setMessageColor "0xf07030"
+	showMessage "${@}"
+	sleep 3
+	finish 1
+}
+
+# Stop processes
+/etc/rc.d/init.d/gmli stop
+/etc/rc.d/init.d/mli stop
+
+sleep 2
+
+# Init messages
+startMessages "/tmp/system-update.message.fifo"
+setMessageColor "50f020"
+
+# Get TFTP file if required
+if [ "${IN_FILE}" = "tftp" ]; then
+	if [ -z "${TFTP_SERVER}" ]; then
+		TFTP_SERVER="devel-host"
+	fi
+
+	showMessage "Getting firmware from ${TFTP_SERVER} ..."
+	/usr/bin/tftp -g "${TFTP_SERVER}" -r "${TFTP_REMOTE_FILE}" -l "${TFTP_LOCAL_FILE}"
+	if [ $? -ne 0 ]; then
+		panic "Impossible to get file from ${TFTP_SERVER}"
+	fi
+
+	IN_FILE="${TFTP_LOCAL_FILE}"
+fi
+
+# Decrypt update file
+showMessage "Extracting firmware files ..."
+/usr/sbin/openssl enc -d -aes-256-cbc -in "${IN_FILE}" -out "${TAR_FILE}" -pass file:"${KEY_FILE}"
+if [ $? -ne 0 ]; then
+	panic "Invalid update file"
+fi
+
+# Extract fpga firmware file
+REBOOT=false
+/bin/tar -xf "${TAR_FILE}" -C /tmp usr/bin/fpga
+if [ $? -ne 0 ]; then
+	echo "Error unpacking FPGA file" >&2
+else
+	MD5_TMP="$(md5sum "/tmp/usr/bin/fpga" | cut -d' ' -f1)"
+	MD5_CUR="$(md5sum "/usr/bin/fpga" | cut -d' ' -f1)"
+	if [ "${MD5_TMP}" != "${MD5_CUR}" ]; then
+		REBOOT=true
+	fi
+fi
+
+# Unpack update files
+showMessage "Installing new files ..."
+/bin/tar -xf "${TAR_FILE}" -C /
+if [ $? -ne 0 ]; then
+	panic "Error unpacking update file"
+fi
+
+if ${REBOOT}; then
+	setMessageColor "f0d020"
+	showMessage "Manual reboot required"
+else
+	finish 0
+fi

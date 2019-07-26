@@ -45,14 +45,7 @@ namespace MComm {
 			bool waitForRead(int fd, int timeout);
 			bool waitForWrite(int fd, int timeout);
 			bool connect(int fd, const struct sockaddr_in& socket);
-	};
-
-	class UDPSocket : public UnixSocket
-	{
-		public:
-			UDPSocket(int port);
-			virtual ~UDPSocket();
-
+			inline std::string getAddress(const struct sockaddr_in& socket) const;
 	};
 }
 
